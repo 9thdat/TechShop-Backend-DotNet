@@ -26,13 +26,6 @@ namespace PhoneShopManagementBackend.Controllers
             _appSettings = appSettings;
         }
 
-        [HttpGet]
-        public ActionResult GetUser()
-        {
-            var user = _context.Users;
-            return Ok(user);
-        }
-
         [HttpGet("Staffs")]
         public ActionResult GetStaffs()
         {
@@ -142,14 +135,6 @@ namespace PhoneShopManagementBackend.Controllers
             public string Token { get; set; }
         }
 
-        [HttpPost]
-        public ActionResult CreateUser(User user)
-        {
-            _context.Users.Add(user);
-            _context.SaveChanges();
-            return CreatedAtAction(nameof(GetUser), new { email = user.Email }, user);
-        }
-
         [HttpPost("Staffs")]
         public ActionResult CreateStaff(User user)
         {
@@ -158,19 +143,6 @@ namespace PhoneShopManagementBackend.Controllers
             _context.Users.Add(user);
             _context.SaveChanges();
             return CreatedAtAction(nameof(GetUser), new { email = user.Email }, user);
-        }
-
-        [HttpPut("{email}")]
-        public ActionResult UpdateUser(string email, User user)
-        {
-            if (email != user.Email)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(user).State = EntityState.Modified;
-            _context.SaveChanges();
-            return NoContent();
         }
 
         [HttpPut("Staffs/Update")]
@@ -198,7 +170,6 @@ namespace PhoneShopManagementBackend.Controllers
             return NoContent();
         }
 
-
         [HttpPut("ChangePassword/{email}")]
         public ActionResult ChangePassword(string email)
         {
@@ -212,21 +183,6 @@ namespace PhoneShopManagementBackend.Controllers
             _context.Entry(userInDb).State = EntityState.Modified;
             _context.SaveChanges();
 
-            return NoContent();
-        }
-
-
-        [HttpDelete("{email}")]
-        public ActionResult DeleteUser(string email)
-        {
-            var user = _context.Users.Find(email);
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            _context.Users.Remove(user);
-            _context.SaveChanges();
             return NoContent();
         }
 

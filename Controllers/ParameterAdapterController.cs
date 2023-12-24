@@ -82,7 +82,5 @@ namespace PhoneShopManagementBackend.Controllers
             _context.SaveChanges();
             return NoContent();
         }
-
-
     }
 }

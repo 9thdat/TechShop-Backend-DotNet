@@ -102,20 +102,5 @@ namespace PhoneShopManagementBackend.Controllers
             return NoContent();
 
         }
-
-        [HttpDelete]
-        public ActionResult DeleteDiscount(int id)
-        {
-            var discount = _context.Discounts.Find(id);
-            if (discount == null)
-            {
-                return NotFound();
-            }
-
-            _context.Discounts.Remove(discount);
-            _context.SaveChanges();
-            return NoContent();
-        }
-
     }
 }

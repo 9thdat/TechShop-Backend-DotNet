@@ -25,17 +25,6 @@ namespace PhoneShopManagementBackend.Controllers
             return Ok(parameterPhone);
         }
 
-        [HttpGet("{id}")]
-        public ActionResult GetParameterPhone(int id)
-        {
-            var parameterPhone = _context.ParameterPhones.Find(id);
-            if (parameterPhone == null)
-            {
-                return NotFound();
-            }
-            return Ok(parameterPhone);
-        }
-
         [HttpGet("ProductId={id}")]
         public ActionResult GetParameterPhoneByProductId(int id)
         {

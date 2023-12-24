@@ -23,18 +23,6 @@ namespace PhoneShopManagementBackend.Controllers
             return Ok(_context.ProductQuantities);
         }
 
-        [HttpGet("{id}")]
-        public IActionResult Get(int id)
-        {
-            var productQuantity = _context.ProductQuantities.Find(id);
-            if (productQuantity == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(productQuantity);
-        }
-
         [HttpGet("ProductId={id}")]
         public IActionResult GetByProductId(int id)
         {
@@ -100,6 +88,12 @@ namespace PhoneShopManagementBackend.Controllers
             if (productQuantityInDb == null)
             {
                 return NotFound();
+            }
+
+            var imageDetails = _context.ImageDetails.Where(i => i.ProductId == productQuantityInDb.ProductId && i.Color == productQuantityInDb.Color);
+            foreach (var imageDetail in imageDetails)
+            {
+                _context.ImageDetails.Remove(imageDetail);
             }
 
             _context.ProductQuantities.Remove(productQuantityInDb);

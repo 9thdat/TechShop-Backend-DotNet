@@ -32,8 +32,26 @@ namespace PhoneShopManagementBackend.Controllers
             {
                 return NotFound();
             }
-            return Ok(product);
+
+            var productQuantities = _context.ProductQuantities.Where(pq => pq.ProductId == id).ToList();
+
+            var productData = new
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Price = product.Price,
+                Description = product.Description,
+                Image = product.Image,
+                Category = product.Category,
+                Brand = product.Brand,
+                PreDiscount = product.PreDiscount,
+                DiscountPercent = product.DiscountPercent,
+                Quantity = productQuantities.Sum(pq => pq.Quantity)
+            };
+
+            return Ok(productData);
         }
+
 
         [HttpGet("GetProductAndQuantity")]
         public ActionResult GetProductAndQuantity()
@@ -77,6 +95,24 @@ namespace PhoneShopManagementBackend.Controllers
             return NoContent();
         }
 
+        [HttpPut("DeleteProduct/{id}")]
+        public ActionResult DeleteProduct(int id)
+        {
+            var productQuantities = _context.ProductQuantities.Where(pq => pq.ProductId == id);
+
+            if (productQuantities == null)
+            {
+                return NotFound();
+            }
+
+            foreach (var productQuantity in productQuantities)
+            {
+                productQuantity.Quantity = 0;
+            }
+            _context.SaveChanges();
+            return NoContent();
+        }
+
         [HttpPut("{id}")]
         public ActionResult UpdateProduct(int id, Product product)
         {
@@ -89,20 +125,5 @@ namespace PhoneShopManagementBackend.Controllers
             _context.SaveChanges();
             return NoContent();
         }
-
-        [HttpDelete("{id}")]
-        public ActionResult DeleteProduct(int id)
-        {
-            var product = _context.Products.Find(id);
-            if (product == null)
-            {
-                return NotFound();
-            }
-
-            _context.Products.Remove(product);
-            _context.SaveChanges();
-            return Ok();
-        }
-
     }
 }

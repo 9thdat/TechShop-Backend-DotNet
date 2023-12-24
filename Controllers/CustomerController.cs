@@ -111,20 +111,5 @@ namespace PhoneShopManagementBackend.Controllers
             _context.SaveChanges();
             return NoContent();
         }
-
-        [HttpDelete("{email}")]
-        public ActionResult DeleteCustomer(string email)
-        {
-            var customer = _context.Customers.Find(email);
-            if (customer == null)
-            {
-                return NotFound();
-            }
-
-            _context.Customers.Remove(customer);
-            _context.SaveChanges();
-            return NoContent();
-        }
-
     }
 }

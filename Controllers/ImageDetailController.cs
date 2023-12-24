@@ -25,17 +25,6 @@ namespace PhoneShopManagementBackend.Controllers
             return Ok(imageDetail);
         }
 
-        [HttpGet("{id}")]
-        public ActionResult GetImageDetail(int id)
-        {
-            var imageDetail = _context.ImageDetails.Find(id);
-            if (imageDetail == null)
-            {
-                return NotFound();
-            }
-            return Ok(imageDetail);
-        }
-
         [HttpGet("ProductId={id}")]
         public ActionResult GetImageByProductId(int id)
         {

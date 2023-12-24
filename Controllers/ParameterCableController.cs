@@ -25,17 +25,6 @@ namespace PhoneShopManagementBackend.Controllers
             return Ok(parameterCable);
         }
 
-        [HttpGet("{id}")]
-        public ActionResult GetParameterCable(int id)
-        {
-            var parameterCable = _context.ParameterCables.Find(id);
-            if (parameterCable == null)
-            {
-                return NotFound();
-            }
-            return Ok(parameterCable);
-        }
-
         [HttpGet("ProductId={id}")]
         public ActionResult GetParameterCableByProductId(int id)
         {

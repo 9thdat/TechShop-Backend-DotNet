@@ -222,45 +222,6 @@ namespace PhoneShopManagementBackend.Controllers
             }
         }
 
-
-        [HttpPut("{id}")]
-        public IActionResult Put(int id, Order order)
-        {
-            var orderInDb = _context.Orders.Find(id);
-            if (orderInDb == null)
-            {
-                return NotFound();
-            }
-
-            orderInDb.CustomerEmail = order.CustomerEmail;
-            orderInDb.OrderDate = order.OrderDate;
-            orderInDb.Status = order.Status;
-            orderInDb.TotalPrice = order.TotalPrice;
-            orderInDb.Address = order.Address;
-            orderInDb.Phone = order.Phone;
-            orderInDb.DiscountId = order.DiscountId;
-            orderInDb.ShippingFee = order.ShippingFee;
-            orderInDb.Note = order.Note;
-            orderInDb.PaymentType = order.PaymentType;
-            orderInDb.DeliveryType = order.DeliveryType;
-            orderInDb.Ward = order.Ward;
-            orderInDb.District = order.District;
-            orderInDb.City = order.City;
-
-            if (order.Status == "Done")
-            {
-                orderInDb.CompletedDate = DateOnly.FromDateTime(DateTime.Today);
-            }
-            else if (order.Status == "Cancelled")
-            {
-                orderInDb.CanceledDate = DateOnly.FromDateTime(DateTime.Today);
-            }
-
-
-            _context.SaveChanges();
-            return Ok();
-        }
-
         [HttpPut("ChangeStatus/{id}")]
         public IActionResult ChangeStatus(int id, Order order)
         {
@@ -281,20 +242,6 @@ namespace PhoneShopManagementBackend.Controllers
                 orderInDb.CanceledDate = DateOnly.FromDateTime(DateTime.Today);
             }
 
-            _context.SaveChanges();
-            return Ok();
-        }
-
-        [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
-        {
-            var orderInDb = _context.Orders.Find(id);
-            if (orderInDb == null)
-            {
-                return NotFound();
-            }
-
-            _context.Orders.Remove(orderInDb);
             _context.SaveChanges();
             return Ok();
         }
