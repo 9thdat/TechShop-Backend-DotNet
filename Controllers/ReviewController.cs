@@ -5,9 +5,9 @@ using PhoneShopManagementBackend.Models;
 
 namespace PhoneShopManagementBackend.Controllers
 {
-    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ReviewController : ControllerBase
     {
         private readonly TechShopContext _context;

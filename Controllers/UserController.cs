@@ -7,11 +7,14 @@ using Microsoft.OpenApi.Models;
 using PhoneShopManagementBackend.Models;
 using PhoneShopManagementBackend.Token;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace PhoneShopManagementBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class UserController : ControllerBase
     {
         private readonly TechShopContext _context;
@@ -24,7 +27,6 @@ namespace PhoneShopManagementBackend.Controllers
         }
 
         [HttpGet]
-        [Authorize]
         public ActionResult GetUser()
         {
             var user = _context.Users;
@@ -32,7 +34,6 @@ namespace PhoneShopManagementBackend.Controllers
         }
 
         [HttpGet("Staffs")]
-        [Authorize]
         public ActionResult GetStaffs()
         {
             var staffs = _context.Users.Where(u => u.Role == "staff");
@@ -41,7 +42,6 @@ namespace PhoneShopManagementBackend.Controllers
         }
 
         [HttpGet("Staffs/Valid/email={email}")]
-        [Authorize]
         public ActionResult GetStaff(string email)
         {
             var staff = _context.Users.Find(email);
@@ -53,7 +53,6 @@ namespace PhoneShopManagementBackend.Controllers
         }
 
         [HttpGet("{email}")]
-        [Authorize]
         public ActionResult GetUser(string email)
         {
             var user = _context.Users.Find(email);
@@ -65,6 +64,7 @@ namespace PhoneShopManagementBackend.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         [Route("Login")]
         public IActionResult ValidateUser([FromBody] UserCredentials credentials)
         {
@@ -104,12 +104,13 @@ namespace PhoneShopManagementBackend.Controllers
         }
 
         [HttpPost("ValidateToken")]
-        public ActionResult ValidateToken([FromBody] TokenRequest request)
+        [AllowAnonymous]
+        public IActionResult ValidateToken([FromBody] TokenRequest request)
         {
             var token = request.Token;
             var jwtTokenHandler = new JwtSecurityTokenHandler();
 
-            var secretKeyBytes = System.Text.Encoding.ASCII.GetBytes(_appSettings.SecretKey);
+            var secretKeyBytes = Encoding.ASCII.GetBytes(_appSettings.SecretKey);
 
             try
             {
@@ -117,20 +118,24 @@ namespace PhoneShopManagementBackend.Controllers
                 {
                     ValidateIssuer = false,
                     ValidateAudience = false,
-
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(secretKeyBytes),
-
                     ClockSkew = TimeSpan.Zero
                 }, out SecurityToken validatedToken);
+
+                // Extract claims from the validated token
+                var claims = ((JwtSecurityToken)validatedToken).Claims;
+
+                // Return the claims
+                return Ok(claims.Select(c => new { Type = c.Type, Value = c.Value }));
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine($"Exception: {ex.Message}");
                 return Unauthorized();
             }
-
-            return Ok();
         }
+
 
         public class TokenRequest
         {
@@ -138,7 +143,6 @@ namespace PhoneShopManagementBackend.Controllers
         }
 
         [HttpPost]
-        [Authorize]
         public ActionResult CreateUser(User user)
         {
             _context.Users.Add(user);
@@ -147,7 +151,6 @@ namespace PhoneShopManagementBackend.Controllers
         }
 
         [HttpPost("Staffs")]
-        [Authorize]
         public ActionResult CreateStaff(User user)
         {
             user.Password = PasswordHasher.HashPassword(user.Password);
@@ -158,7 +161,6 @@ namespace PhoneShopManagementBackend.Controllers
         }
 
         [HttpPut("{email}")]
-        [Authorize]
         public ActionResult UpdateUser(string email, User user)
         {
             if (email != user.Email)
@@ -172,7 +174,6 @@ namespace PhoneShopManagementBackend.Controllers
         }
 
         [HttpPut("Staffs/Update")]
-        [Authorize]
         public ActionResult UpdateStaff(User user)
         {
             var staff = _context.Users.Find(user.Email);
@@ -199,7 +200,6 @@ namespace PhoneShopManagementBackend.Controllers
 
 
         [HttpPut("ChangePassword/{email}")]
-        [Authorize]
         public ActionResult ChangePassword(string email)
         {
             var userInDb = _context.Users.Find(email);
@@ -217,7 +217,6 @@ namespace PhoneShopManagementBackend.Controllers
 
 
         [HttpDelete("{email}")]
-        [Authorize]
         public ActionResult DeleteUser(string email)
         {
             var user = _context.Users.Find(email);

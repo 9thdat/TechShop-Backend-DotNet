@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PhoneShopManagementBackend.Models;
 
@@ -6,6 +7,7 @@ namespace PhoneShopManagementBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ProductQuantityController : ControllerBase
     {
         private readonly TechShopContext _context;
