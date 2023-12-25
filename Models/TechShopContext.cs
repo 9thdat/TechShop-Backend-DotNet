@@ -13,15 +13,9 @@ public partial class TechShopContext : DbContext
     {
     }
 
-    public virtual DbSet<Cart> Carts { get; set; }
-
-    public virtual DbSet<CartDetail> CartDetails { get; set; }
-
     public virtual DbSet<Category> Categories { get; set; }
 
     public virtual DbSet<Customer> Customers { get; set; }
-
-    public virtual DbSet<CustomerValidateEmail> CustomerValidateEmails { get; set; }
 
     public virtual DbSet<Discount> Discounts { get; set; }
 
@@ -53,16 +47,6 @@ public partial class TechShopContext : DbContext
             .UseCollation("utf8mb4_0900_ai_ci")
             .HasCharSet("utf8mb4");
 
-        modelBuilder.Entity<Cart>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PRIMARY");
-        });
-
-        modelBuilder.Entity<CartDetail>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PRIMARY");
-        });
-
         modelBuilder.Entity<Category>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
@@ -73,11 +57,6 @@ public partial class TechShopContext : DbContext
         modelBuilder.Entity<Customer>(entity =>
         {
             entity.HasKey(e => e.Email).HasName("PRIMARY");
-        });
-
-        modelBuilder.Entity<CustomerValidateEmail>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PRIMARY");
         });
 
         modelBuilder.Entity<Discount>(entity =>
