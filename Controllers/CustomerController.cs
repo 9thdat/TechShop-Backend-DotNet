@@ -84,6 +84,39 @@ namespace PhoneShopManagementBackend.Controllers
             return Ok(customer);
         }
 
+        [HttpGet("Top5Customers")]
+        public IActionResult GetTop5Customer()
+        {
+            var orders = _context.Orders
+                .Where(o => o.CompletedDate.Value.Month == DateTime.Today.Month)
+                .ToList();
+
+            var top5Customers = orders
+                .GroupBy(o => o.CustomerEmail)
+                .Select(g => new
+                {
+                    customerEmail = g.Key,
+                    name = _context.Customers
+                        .Where(c => c.Email == g.Key)
+                        .Select(c => c.Name)
+                        .FirstOrDefault(),
+                    image = _context.Customers
+                        .Where(c => c.Email == g.Key)
+                        .Select(c => c.Image)
+                        .FirstOrDefault(),
+                    phone = _context.Customers
+                        .Where(c => c.Email == g.Key)
+                        .Select(c => c.Phone)
+                        .FirstOrDefault(),
+                    revenue = g.Sum(o => o.TotalPrice)
+                })
+                .OrderByDescending(o => o.revenue)
+                .Take(5)
+                .ToArray();
+
+            return Ok(top5Customers);
+        }
+
         [HttpPut]
         public ActionResult UpdateCustomer([FromForm] string email, [FromForm] Customer customer)
         {

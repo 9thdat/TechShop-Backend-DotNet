@@ -97,44 +97,6 @@ namespace PhoneShopManagementBackend.Controllers
             return Ok(result);
         }
 
-        [HttpGet("Top9Customers")]
-        public IActionResult GetTop9Customer()
-        {
-            // Lấy danh sách đơn hàng có CompletedDate trong tháng hiện tại
-            var orders = _context.Orders
-                .Where(o => o.CompletedDate.Value.Month == DateTime.Today.Month)
-                .ToList();
-
-            // Lấy danh sách email của top 9 khách hàng
-            var top9CustomerEmails = orders
-                .GroupBy(o => o.CustomerEmail)
-                .OrderByDescending(g => g.Sum(o => o.TotalPrice))
-                .Take(9)
-                .Select(g => g.Key)
-                .ToList();
-
-            // Lấy thông tin của top 9 khách hàng
-            var customerInfo = _context.Customers
-                .Where(c => top9CustomerEmails.Contains(c.Email))
-                .ToDictionary(c => c.Email);
-
-            // Tạo danh sách kết quả
-            var top9Customers = top9CustomerEmails
-                .Select(email => new
-                {
-                    customerEmail = email,
-                    name = customerInfo[email]?.Name,
-                    image = customerInfo[email]?.Image,
-                    phone = customerInfo[email]?.Phone,
-                    revenue = orders.Where(o => o.CustomerEmail == email).Sum(o => o.TotalPrice)
-                })
-                .ToArray();
-
-            return Ok(top9Customers);
-        }
-
-
-
         [HttpGet("GetLastId")]
         public IActionResult GetLastId()
         {
@@ -208,6 +170,12 @@ namespace PhoneShopManagementBackend.Controllers
                 order.OrderDate = DateOnly.FromDateTime(DateTime.Today);
                 order.CanceledDate = null; // Set to null as it's nullable
                 order.CompletedDate = null; // Set to null as it's nullable
+
+                if (order.DiscountId != null)
+                {
+                    var discount = _context.Discounts.Find(order.DiscountId);
+                    discount.Quantity--;
+                }
 
                 _context.Orders.Add(order);
                 _context.SaveChanges();
