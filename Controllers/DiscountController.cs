@@ -65,6 +65,15 @@ namespace PhoneShopManagementBackend.Controllers
         {
             DateOnly currentDate = DateOnly.FromDateTime(DateTime.Today);
 
+            if (discount.EndDate < currentDate)
+            {
+                discount.Status = "expired";
+            }
+            else
+            {
+                discount.Status = "active";
+            }
+
             discount.CreatedAt = currentDate;
             _context.Discounts.Add(discount);
             _context.SaveChanges();
@@ -80,9 +89,14 @@ namespace PhoneShopManagementBackend.Controllers
             {
                 return NotFound();
             }
-            if (discount.Status == "disable")
+
+            if (discount.EndDate < DateOnly.FromDateTime(DateTime.Today))
             {
-                discountToUpdate.DisabledAt = DateOnly.FromDateTime(DateTime.Today);
+                discountToUpdate.Status = "expired";
+            }
+            else
+            {
+                discountToUpdate.Status = "active";
             }
 
             discountToUpdate.Code = discount.Code;
@@ -94,8 +108,8 @@ namespace PhoneShopManagementBackend.Controllers
             discountToUpdate.MinApply = discount.MinApply;
             discountToUpdate.MaxSpeed = discount.MaxSpeed;
             discountToUpdate.Quantity = discount.Quantity;
-            discountToUpdate.Status = discount.Status;
             discountToUpdate.UpdatedAt = DateOnly.FromDateTime(DateTime.Today);
+            discountToUpdate.DisabledAt = discount.EndDate;
 
             _context.Entry(discountToUpdate).State = EntityState.Modified;
             _context.SaveChanges();
