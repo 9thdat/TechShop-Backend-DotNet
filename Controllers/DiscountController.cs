@@ -23,6 +23,36 @@ namespace PhoneShopManagementBackend.Controllers
         public ActionResult GetDiscount()
         {
             var discount = _context.Discounts;
+
+            // Check if discount is expired
+            // Lấy ngày hiện tại
+            DateTime currentDate = DateTime.Now;
+
+            // Chuyển đổi sang múi giờ GMT+7
+            TimeZoneInfo gmtPlus7 = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            DateTime gmtPlus7Date = TimeZoneInfo.ConvertTime(currentDate, gmtPlus7);
+
+            // Lấy ngày chỉ (DateOnly) từ thời gian đã chuyển đổi
+            DateOnly dateOnly = DateOnly.FromDateTime(gmtPlus7Date);
+            foreach (var d in discount)
+            {
+                if (d.Status != "inactive")
+                {
+                    if (d.EndDate <= dateOnly)
+                    {
+                        d.Status = "expired";
+                        d.DisabledAt = d.EndDate;
+                    }
+                    else
+                    {
+                        d.Status = "active";
+                    }
+                }
+                else
+                {
+                    d.DisabledAt = d.EndDate;
+                }
+            }
             return Ok(discount);
         }
 
@@ -63,18 +93,32 @@ namespace PhoneShopManagementBackend.Controllers
         [HttpPost]
         public ActionResult CreateDiscount(Discount discount)
         {
-            DateOnly currentDate = DateOnly.FromDateTime(DateTime.Today);
+            // Lấy ngày hiện tại
+            DateTime currentDate = DateTime.Now;
 
-            if (discount.EndDate < currentDate)
+            // Chuyển đổi sang múi giờ GMT+7
+            TimeZoneInfo gmtPlus7 = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            DateTime gmtPlus7Date = TimeZoneInfo.ConvertTime(currentDate, gmtPlus7);
+
+            // Lấy ngày chỉ (DateOnly) từ thời gian đã chuyển đổi
+            DateOnly dateOnly = DateOnly.FromDateTime(gmtPlus7Date);
+            if (discount.Status != "inactive")
             {
-                discount.Status = "expired";
+                if (discount.EndDate <= dateOnly)
+                {
+                    discount.Status = "expired";
+                }
+                else
+                {
+                    discount.Status = "active";
+                }
             }
             else
             {
-                discount.Status = "active";
+                discount.DisabledAt = discount.EndDate;
             }
 
-            discount.CreatedAt = currentDate;
+            discount.CreatedAt = dateOnly;
             _context.Discounts.Add(discount);
             _context.SaveChanges();
 
@@ -90,13 +134,26 @@ namespace PhoneShopManagementBackend.Controllers
                 return NotFound();
             }
 
-            if (discount.EndDate < DateOnly.FromDateTime(DateTime.Today))
+            // Lấy ngày hiện tại
+            DateTime currentDate = DateTime.Now;
+
+            // Chuyển đổi sang múi giờ GMT+7
+            TimeZoneInfo gmtPlus7 = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            DateTime gmtPlus7Date = TimeZoneInfo.ConvertTime(currentDate, gmtPlus7);
+
+            // Lấy ngày chỉ (DateOnly) từ thời gian đã chuyển đổi
+            DateOnly dateOnly = DateOnly.FromDateTime(gmtPlus7Date);
+            if (discountToUpdate.Status != "inactive")
             {
-                discountToUpdate.Status = "expired";
-            }
-            else
-            {
-                discountToUpdate.Status = "active";
+                if (discount.EndDate <= dateOnly)
+                {
+                    discountToUpdate.Status = "expired";
+                    discountToUpdate.DisabledAt = discount.EndDate;
+                }
+                else
+                {
+                    discountToUpdate.Status = "active";
+                }
             }
 
             discountToUpdate.Code = discount.Code;
@@ -108,7 +165,7 @@ namespace PhoneShopManagementBackend.Controllers
             discountToUpdate.MinApply = discount.MinApply;
             discountToUpdate.MaxSpeed = discount.MaxSpeed;
             discountToUpdate.Quantity = discount.Quantity;
-            discountToUpdate.UpdatedAt = DateOnly.FromDateTime(DateTime.Today);
+            discountToUpdate.UpdatedAt = dateOnly;
             discountToUpdate.DisabledAt = discount.EndDate;
 
             _context.Entry(discountToUpdate).State = EntityState.Modified;
