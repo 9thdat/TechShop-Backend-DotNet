@@ -34,6 +34,11 @@ namespace PhoneShopManagementBackend.Controllers
                 return NotFound();
             }
 
+            if (order == null)
+            {
+                return NotFound();
+            }
+
             return Ok(order);
         }
 
@@ -48,7 +53,8 @@ namespace PhoneShopManagementBackend.Controllers
         public IActionResult GetTodayCompleted()
         {
             var ordersTodayCompletedCount = _context.Orders.Count(o =>
-                o.Status == "Done" && o.CompletedDate == DateOnly.FromDateTime(DateTime.Today));
+                o.Status == "Done" && o.CompletedDate != null && o.CompletedDate == DateOnly.FromDateTime(DateTime.Today)
+            );
             return Ok(ordersTodayCompletedCount);
         }
 
@@ -56,7 +62,8 @@ namespace PhoneShopManagementBackend.Controllers
 
         public IActionResult GetRevenueToday()
         {
-            var ordersToday = _context.Orders.Where(o => o.CompletedDate == DateOnly.FromDateTime(DateTime.Today));
+            var ordersToday = _context.Orders.Where(o => o.CompletedDate != null && o.CompletedDate == DateOnly.FromDateTime(DateTime.Today)
+            );
             double revenueToday = 0;
             foreach (var order in ordersToday)
             {
@@ -91,7 +98,11 @@ namespace PhoneShopManagementBackend.Controllers
 
             foreach (var order in ordersThisMonth)
             {
-                revenueEachDayThisMonth[order.CompletedDate.Value.Day - 1] += order.TotalPrice;
+                if (order.CompletedDate != null)
+                {
+                    revenueEachDayThisMonth[order.CompletedDate.Value.Day - 1] += order.TotalPrice;
+                }
+
             }
 
             var result = revenueEachDayThisMonth
@@ -128,6 +139,36 @@ namespace PhoneShopManagementBackend.Controllers
                 {
                     Date = $"{g.Key.Date}",
                     Revenue = g.Sum(o => o.TotalPrice)
+                })
+                .ToList();
+
+            return Ok(result);
+        }
+
+        [HttpGet("GetMonthlyRevenueByProduct")]
+        public IActionResult GetMonthlyRevenueByProduct([FromQuery] int startMonth, [FromQuery] int startYear,
+            [FromQuery] int endMonth, [FromQuery] int endYear, [FromQuery] int? productId)
+        {
+            DateOnly startDate = new DateOnly(startYear, startMonth, 1);
+            DateOnly endDate = new DateOnly(endYear, endMonth, DateTime.DaysInMonth(endYear, endMonth));
+
+            // Apply OrderBy to sort by CompletedDate in ascending order
+            var result = _context.OrderDetails
+                .Join(
+                                       _context.Orders,
+                                                          orderDetail => orderDetail.OrderId,
+                                                          order => order.Id,
+                                                          (orderDetail, order) => new { OrderDetail = orderDetail, Order = order }
+                                                      )
+                .Where(o => o.Order.CompletedDate >= startDate && o.Order.CompletedDate <= endDate &&
+                                                       (!productId.HasValue || o.OrderDetail.ProductId == productId)) // Added productId filter
+                .OrderBy(o => o.Order.CompletedDate) // Add this line for sorting
+                .GroupBy(o => new { Date = o.Order.CompletedDate })
+                .AsEnumerable()
+                .Select(g => new
+                {
+                    Date = $"{g.Key.Date}",
+                    Revenue = g.Sum(o => o.OrderDetail.Quantity * o.OrderDetail.Price)
                 })
                 .ToList();
 
