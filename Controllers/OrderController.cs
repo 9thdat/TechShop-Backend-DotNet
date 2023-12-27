@@ -47,7 +47,8 @@ namespace PhoneShopManagementBackend.Controllers
         [HttpGet("TodayCompleted")]
         public IActionResult GetTodayCompleted()
         {
-            var ordersTodayCompletedCount = _context.Orders.Count(o => o.Status == "Done" && o.CompletedDate == DateOnly.FromDateTime(DateTime.Today));
+            var ordersTodayCompletedCount = _context.Orders.Count(o =>
+                o.Status == "Done" && o.CompletedDate == DateOnly.FromDateTime(DateTime.Today));
             return Ok(ordersTodayCompletedCount);
         }
 
@@ -61,6 +62,7 @@ namespace PhoneShopManagementBackend.Controllers
             {
                 revenueToday += order.TotalPrice;
             }
+
             return Ok(revenueToday);
         }
 
@@ -73,6 +75,7 @@ namespace PhoneShopManagementBackend.Controllers
             {
                 revenueThisMonth += order.TotalPrice;
             }
+
             return Ok(revenueThisMonth);
         }
 
@@ -83,7 +86,8 @@ namespace PhoneShopManagementBackend.Controllers
                 .Where(o => o.CompletedDate.Value.Month == DateTime.Today.Month)
                 .ToList(); // ToList để đảm bảo dữ liệu được truy xuất từ database trước khi thực hiện LINQ
 
-            double[] revenueEachDayThisMonth = new double[DateTime.DaysInMonth(DateTime.Today.Year, DateTime.Today.Month)];
+            double[] revenueEachDayThisMonth =
+                new double[DateTime.DaysInMonth(DateTime.Today.Year, DateTime.Today.Month)];
 
             foreach (var order in ordersThisMonth)
             {
@@ -108,7 +112,8 @@ namespace PhoneShopManagementBackend.Controllers
         }
 
         [HttpGet("GetMonthlyRevenue")]
-        public IActionResult GetMonthlyRevenue([FromQuery] int startMonth, [FromQuery] int startYear, [FromQuery] int endMonth, [FromQuery] int endYear)
+        public IActionResult GetMonthlyRevenue([FromQuery] int startMonth, [FromQuery] int startYear,
+            [FromQuery] int endMonth, [FromQuery] int endYear)
         {
             DateOnly startDate = new DateOnly(startYear, startMonth, 1);
             DateOnly endDate = new DateOnly(endYear, endMonth, DateTime.DaysInMonth(endYear, endMonth));
@@ -116,7 +121,7 @@ namespace PhoneShopManagementBackend.Controllers
             // Apply OrderBy to sort by CompletedDate in ascending order
             var result = _context.Orders
                 .Where(o => o.CompletedDate >= startDate && o.CompletedDate <= endDate)
-                .OrderBy(o => o.CompletedDate)  // Add this line for sorting
+                .OrderBy(o => o.CompletedDate) // Add this line for sorting
                 .GroupBy(o => new { Date = o.CompletedDate })
                 .AsEnumerable()
                 .Select(g => new
@@ -204,14 +209,16 @@ namespace PhoneShopManagementBackend.Controllers
             if (order.Status == "Done")
             {
                 orderInDb.CompletedDate = DateOnly.FromDateTime(DateTime.Today);
+
             }
             else if (order.Status == "Cancelled")
             {
                 orderInDb.CanceledDate = DateOnly.FromDateTime(DateTime.Today);
             }
 
+            _context.Entry(orderInDb).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
             _context.SaveChanges();
-            return Ok();
+            return NoContent();
         }
     }
 }

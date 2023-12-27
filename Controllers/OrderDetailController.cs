@@ -114,5 +114,30 @@ namespace PhoneShopManagementBackend.Controllers
             _context.SaveChanges();
             return Ok();
         }
+
+        [HttpPut("CancelOrder/{orderId}")]
+        public IActionResult CancelOrder()
+        {
+            var orderDetailInDb = _context.OrderDetails
+                .Where(od => od.OrderId == int.Parse(HttpContext.Request.RouteValues["orderId"].ToString()))
+                .FirstOrDefault();
+
+            if (orderDetailInDb == null)
+            {
+                return NotFound();
+            }
+
+            var productQuantityInDb = _context.ProductQuantities.Where(pq => pq.ProductId == orderDetailInDb.ProductId && pq.Color == orderDetailInDb.Color).FirstOrDefault();
+            if (productQuantityInDb == null)
+            {
+                return NotFound();
+            }
+
+            productQuantityInDb.Quantity += orderDetailInDb.Quantity;
+            productQuantityInDb.Sold -= orderDetailInDb.Quantity;
+
+            _context.SaveChanges();
+            return Ok();
+        }
     }
 }

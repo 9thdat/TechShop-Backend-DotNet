@@ -68,8 +68,10 @@ builder.Services.AddAuthorization();
 builder.Services.AddAuthentication();
 
 builder.Services.AddDbContext<TechShopContext>(options =>
-    options.UseMySql(builder.Configuration.GetConnectionString("DevConnection"), ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DevConnection")))
-);
+        options.UseMySql(builder.Configuration.GetConnectionString("DevConnection"),
+            ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DevConnection"))),
+    ServiceLifetime.Scoped);
+
 
 var appSettings = builder.Configuration.GetSection("AppSettings").Get<AppSettings>();
 builder.Services.AddSingleton(appSettings);
