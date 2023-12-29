@@ -17,13 +17,6 @@ namespace PhoneShopManagementBackend.Controllers
             _context = context;
         }
 
-        [HttpGet]
-        public ActionResult GetProduct()
-        {
-            var product = _context.Products;
-            return Ok(product);
-        }
-
         [HttpGet("{id}")]
         public ActionResult GetProduct(int id)
         {

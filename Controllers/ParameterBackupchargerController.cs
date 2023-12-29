@@ -18,13 +18,6 @@ namespace PhoneShopManagementBackend.Controllers
             _context = context;
         }
 
-        [HttpGet]
-        public ActionResult GetParameterBackupcharger()
-        {
-            var parameterBackupcharger = _context.ParameterBackupchargers;
-            return Ok(parameterBackupcharger);
-        }
-
         [HttpGet("ProductId={productId}")]
         public ActionResult GetParameterBackupchargerByProductId(int productId)
         {

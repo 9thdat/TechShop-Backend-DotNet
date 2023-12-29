@@ -18,13 +18,6 @@ namespace PhoneShopManagementBackend.Controllers
             _context = context;
         }
 
-        [HttpGet]
-        public ActionResult GetParameterCable()
-        {
-            var parameterCable = _context.ParameterCables;
-            return Ok(parameterCable);
-        }
-
         [HttpGet("ProductId={id}")]
         public ActionResult GetParameterCableByProductId(int id)
         {

@@ -44,6 +44,17 @@ namespace PhoneShopManagementBackend.Controllers
             return Ok(customers);
         }
 
+        [HttpGet("{email}")]
+        public ActionResult GetCustomer(string email)
+        {
+            var customer = _context.Customers.Find(email);
+            if (customer == null)
+            {
+                return NotFound();
+            }
+            return Ok(customer);
+        }
+
         [HttpPost]
         public ActionResult CreateCustomer(Customer customer)
         {
@@ -70,18 +81,6 @@ namespace PhoneShopManagementBackend.Controllers
                     message = "Email already exists"
                 });
             }
-        }
-
-
-        [HttpGet("{email}")]
-        public ActionResult GetCustomer(string email)
-        {
-            var customer = _context.Customers.Find(email);
-            if (customer == null)
-            {
-                return NotFound();
-            }
-            return Ok(customer);
         }
 
         [HttpGet("Top5Customers")]
@@ -115,19 +114,6 @@ namespace PhoneShopManagementBackend.Controllers
                 .ToArray();
 
             return Ok(top5Customers);
-        }
-
-        [HttpPut]
-        public ActionResult UpdateCustomer([FromForm] string email, [FromForm] Customer customer)
-        {
-            if (email != customer.Email)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(customer).State = EntityState.Modified;
-            _context.SaveChanges();
-            return NoContent();
         }
 
         [HttpPut("ChangeStatus/Email={Email}")]

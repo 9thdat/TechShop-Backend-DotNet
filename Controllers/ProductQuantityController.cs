@@ -17,11 +17,6 @@ namespace PhoneShopManagementBackend.Controllers
             _context = context;
         }
 
-        [HttpGet]
-        public IActionResult Get()
-        {
-            return Ok(_context.ProductQuantities);
-        }
 
         [HttpGet("ProductId={id}")]
         public IActionResult GetByProductId(int id)
@@ -44,18 +39,6 @@ namespace PhoneShopManagementBackend.Controllers
                 return NotFound();
             }
             return Ok(totalQuantity);
-        }
-
-        [HttpGet("GetLastId")]
-        public IActionResult GetLastId()
-        {
-            var productQuantity = _context.ProductQuantities.Find(_context.ProductQuantities.Count());
-            if (productQuantity == null)
-            {
-                return Ok();
-            }
-
-            return Ok(productQuantity);
         }
 
         [HttpPost]

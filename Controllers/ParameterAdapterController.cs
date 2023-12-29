@@ -18,24 +18,6 @@ namespace PhoneShopManagementBackend.Controllers
             _context = context;
         }
 
-        [HttpGet]
-        public ActionResult GetParameterAdapter()
-        {
-            var parameterAdapter = _context.ParameterAdapters;
-            return Ok(parameterAdapter);
-        }
-
-        [HttpGet("{id}")]
-        public ActionResult GetParameterAdapter(int id)
-        {
-            var parameterAdapter = _context.ParameterAdapters.Find(id);
-            if (parameterAdapter == null)
-            {
-                return NotFound();
-            }
-            return Ok(parameterAdapter);
-        }
-
         [HttpGet("ProductId={id}")]
         public ActionResult GetParameterAdapterByProductId(int id)
         {

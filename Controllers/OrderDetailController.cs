@@ -17,12 +17,6 @@ namespace PhoneShopManagementBackend.Controllers
             _context = context;
         }
 
-        [HttpGet]
-        public IActionResult Get()
-        {
-            return Ok(_context.OrderDetails);
-        }
-
         [HttpGet("OrderId={orderId}")]
         public IActionResult Get(int orderId)
         {
@@ -45,42 +39,6 @@ namespace PhoneShopManagementBackend.Controllers
             }
 
             return Ok(lastOrderDetail);
-        }
-
-        [HttpGet("QuantityProduct/ProductId={productId}")]
-        public IActionResult GetQuantityProduct()
-        {
-            var quantityProduct = _context.OrderDetails.GroupBy(od => od.ProductId).Select(od => new { ProductId = od.Key, Quantity = od.Sum(od => od.Quantity) });
-            if (quantityProduct == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(quantityProduct);
-        }
-
-        [HttpGet("ProductId={productId}")]
-        public IActionResult GetByProductId(int productId)
-        {
-            var orderDetails = _context.OrderDetails.Where(od => od.ProductId == productId);
-            if (orderDetails == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(orderDetails);
-        }
-
-        [HttpGet("TotalPrice/OrderId={orderId}")]
-        public IActionResult GetTotalPrice(int orderId)
-        {
-            var totalPrice = _context.OrderDetails.Where(od => od.OrderId == orderId).Sum(od => od.Price * od.Quantity);
-            if (totalPrice == 0)
-            {
-                return NotFound();
-            }
-
-            return Ok(totalPrice);
         }
 
         [HttpPost]

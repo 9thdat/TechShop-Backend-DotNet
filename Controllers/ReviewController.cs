@@ -24,19 +24,6 @@ namespace PhoneShopManagementBackend.Controllers
             return Ok(reviews);
         }
 
-        [HttpGet("{id}")]
-        public ActionResult GetById(int id)
-        {
-            var review = _context.Reviews.Find(id);
-
-            if (review == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(review);
-        }
-
         [HttpPut("Id={id}&Content={content}")]
         public ActionResult Update(int id, string content)
         {
