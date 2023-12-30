@@ -34,10 +34,6 @@ namespace PhoneShopManagementBackend.Controllers
         public IActionResult GetTotalQuantity(int id, string color)
         {
             var totalQuantity = _context.ProductQuantities.Where(p => p.ProductId == id && p.Color == color).Sum(p => p.Quantity);
-            if (totalQuantity == 0)
-            {
-                return NotFound();
-            }
             return Ok(totalQuantity);
         }
 

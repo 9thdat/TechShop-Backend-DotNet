@@ -74,28 +74,53 @@ namespace PhoneShopManagementBackend.Controllers
         }
 
         [HttpPut("CancelOrder/{orderId}")]
-        public IActionResult CancelOrder()
+        public IActionResult CancelOrder(int orderId)
         {
-            var orderDetailInDb = _context.OrderDetails
-                .Where(od => od.OrderId == int.Parse(HttpContext.Request.RouteValues["orderId"].ToString()))
-                .FirstOrDefault();
-
-            if (orderDetailInDb == null)
+            try
             {
-                return NotFound();
-            }
+                // Get order details
+                var orderDetails = _context.OrderDetails
+                    .Where(od => od.OrderId == orderId)
+                    .ToList();
 
-            var productQuantityInDb = _context.ProductQuantities.Where(pq => pq.ProductId == orderDetailInDb.ProductId && pq.Color == orderDetailInDb.Color).FirstOrDefault();
-            if (productQuantityInDb == null)
+                if (orderDetails == null || !orderDetails.Any())
+                {
+                    return NotFound(new { status = 404, message = "Order details not found" });
+                }
+
+                // Process each order detail
+                foreach (var orderDetail in orderDetails)
+                {
+                    var productId = orderDetail.ProductId;
+                    var color = orderDetail.Color;
+                    var quantity = orderDetail.Quantity;
+
+                    // Get product quantity in DB
+                    var productQuantityInDb = _context.ProductQuantities
+                        .FirstOrDefault(pq => pq.ProductId == productId && pq.Color == color);
+
+                    if (productQuantityInDb != null)
+                    {
+                        // Update product quantity
+                        productQuantityInDb.Quantity += quantity;
+                        productQuantityInDb.Sold -= quantity;
+
+                        // Save changes
+                        _context.ProductQuantities.Update(productQuantityInDb);
+                    }
+                }
+
+                _context.SaveChanges();
+
+                return Ok(new { status = 200, message = "Order canceled successfully" });
+            }
+            catch (Exception ex)
             {
-                return NotFound();
+                // Log the exception for debugging purposes
+                Console.WriteLine(ex);
+                return StatusCode(500, new { status = 500, message = "Internal server error" });
             }
-
-            productQuantityInDb.Quantity += orderDetailInDb.Quantity;
-            productQuantityInDb.Sold -= orderDetailInDb.Quantity;
-
-            _context.SaveChanges();
-            return Ok();
         }
+
     }
 }
