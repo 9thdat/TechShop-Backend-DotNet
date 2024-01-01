@@ -23,8 +23,6 @@ namespace PhoneShopManagementBackend.Controllers
         public ActionResult GetDiscount()
         {
             var discount = _context.Discounts;
-
-            // Check if discount is expired
             // Lấy ngày hiện tại
             DateTime currentDate = DateTime.Now;
 
@@ -34,6 +32,8 @@ namespace PhoneShopManagementBackend.Controllers
 
             // Lấy ngày chỉ (DateOnly) từ thời gian đã chuyển đổi
             DateOnly dateOnly = DateOnly.FromDateTime(gmtPlus7Date);
+            // Check if discount is expired
+
             foreach (var d in discount)
             {
                 if (d.Status != "inactive")
@@ -102,7 +102,7 @@ namespace PhoneShopManagementBackend.Controllers
 
             // Lấy ngày chỉ (DateOnly) từ thời gian đã chuyển đổi
             DateOnly dateOnly = DateOnly.FromDateTime(gmtPlus7Date);
-            if (discount.Status != "inactive")
+            if (discount.Status != "disabled")
             {
                 if (discount.EndDate <= dateOnly)
                 {
@@ -143,7 +143,7 @@ namespace PhoneShopManagementBackend.Controllers
 
             // Lấy ngày chỉ (DateOnly) từ thời gian đã chuyển đổi
             DateOnly dateOnly = DateOnly.FromDateTime(gmtPlus7Date);
-            if (discountToUpdate.Status != "inactive")
+            if (discountToUpdate.Status != "disabled")
             {
                 if (discount.EndDate <= dateOnly)
                 {
