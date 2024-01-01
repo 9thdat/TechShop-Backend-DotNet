@@ -36,7 +36,7 @@ namespace PhoneShopManagementBackend.Controllers
 
             foreach (var d in discount)
             {
-                if (d.Status != "inactive")
+                if (d.Status != "disabled")
                 {
                     if (d.EndDate <= dateOnly)
                     {
