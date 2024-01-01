@@ -22,7 +22,11 @@ namespace PhoneShopManagementBackend.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok(_context.Orders);
+            // Order by OrderDate in descending order
+            var orders = _context.Orders
+                .OrderByDescending(o => o.OrderDate)
+                .ToList();
+            return Ok(orders);
         }
 
         [HttpGet("{id}")]
