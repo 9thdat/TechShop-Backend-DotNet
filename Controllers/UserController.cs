@@ -170,19 +170,20 @@ namespace PhoneShopManagementBackend.Controllers
             return NoContent();
         }
 
-        [HttpPut("ChangePassword/{email}")]
-        public ActionResult ChangePassword(string email)
+
+        [HttpPut("ChangePassword/email={email}&newPassword={newPassword}")]
+        public ActionResult ChangePassword(string email, string newPassword)
         {
-            var userInDb = _context.Users.Find(email);
-            if (userInDb == null)
+            var userToUpdate = _context.Users.Find(email);
+            if (userToUpdate == null)
             {
                 return NotFound();
             }
 
-            userInDb.Password = PasswordHasher.HashPassword(userInDb.Password);
-            _context.Entry(userInDb).State = EntityState.Modified;
-            _context.SaveChanges();
+            userToUpdate.Password = PasswordHasher.HashPassword(newPassword);
 
+            _context.Entry(userToUpdate).State = EntityState.Modified;
+            _context.SaveChanges();
             return NoContent();
         }
 
@@ -209,3 +210,5 @@ namespace PhoneShopManagementBackend.Controllers
         }
     }
 }
+
+
