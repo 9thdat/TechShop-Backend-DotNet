@@ -73,7 +73,7 @@ namespace PhoneShopManagementBackend.Controllers
                 return NotFound(new { Message = "User not found" });
             }
 
-            if (user.Password != credentials.Password)
+            if (PasswordHasher.VerifyPassword(credentials.Password, user.Password) == false)
             {
                 return Unauthorized(new { Message = "Invalid password" });
             }
@@ -135,7 +135,7 @@ namespace PhoneShopManagementBackend.Controllers
             public string Token { get; set; }
         }
 
-        [HttpPost("Staffs")]
+        [HttpPost("Staff")]
         public ActionResult CreateStaff(User user)
         {
             user.Password = PasswordHasher.HashPassword(user.Password);
