@@ -53,6 +53,9 @@ namespace PhoneShopManagementBackend.Controllers
                     d.DisabledAt = d.EndDate;
                 }
             }
+            // Update database
+            _context.SaveChanges();
+
             return Ok(discount);
         }
 
