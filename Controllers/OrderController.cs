@@ -236,7 +236,7 @@ namespace PhoneShopManagementBackend.Controllers
             {
                 // Log the exception for debugging purposes
                 Console.WriteLine(ex);
-                return StatusCode(500, "Internal server error");
+                return StatusCode(500, ex);
             }
         }
 

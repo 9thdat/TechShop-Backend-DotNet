@@ -52,6 +52,7 @@ namespace PhoneShopManagementBackend.Controllers
             {
                 return NotFound();
             }
+            customer.Password = "";
             return Ok(customer);
         }
 
