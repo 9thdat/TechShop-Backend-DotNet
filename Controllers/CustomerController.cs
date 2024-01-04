@@ -93,29 +93,34 @@ namespace PhoneShopManagementBackend.Controllers
 
             var top5Customers = orders
                 .GroupBy(o => o.CustomerEmail)
-                .Select(g => new
+                .Select(g =>
                 {
-                    customerEmail = g.Key,
-                    name = _context.Customers
-                        .Where(c => c.Email == g.Key)
-                        .Select(c => c.Name)
-                        .FirstOrDefault(),
-                    image = _context.Customers
-                        .Where(c => c.Email == g.Key)
-                        .Select(c => c.Image)
-                        .FirstOrDefault(),
-                    phone = _context.Customers
-                        .Where(c => c.Email == g.Key)
-                        .Select(c => c.Phone)
-                        .FirstOrDefault(),
-                    revenue = g.Sum(o => o.TotalPrice)
+                    var customer = _context.Customers.FirstOrDefault(c => c.Email == g.Key);
+
+                    if (customer != null)
+                    {
+                        return new
+                        {
+                            customerEmail = g.Key,
+                            name = customer.Name,
+                            image = customer.Image,
+                            phone = customer.Phone,
+                            revenue = g.Sum(o => o.TotalPrice)
+                        };
+                    }
+                    else
+                    {
+                        return null; // or handle as needed
+                    }
                 })
+                .Where(c => c != null) // Filter out null entries
                 .OrderByDescending(o => o.revenue)
                 .Take(5)
                 .ToArray();
 
             return Ok(top5Customers);
         }
+
 
         [HttpPut("ChangeStatus/Email={Email}")]
         public ActionResult ChangeCurrentStatus(string Email)
