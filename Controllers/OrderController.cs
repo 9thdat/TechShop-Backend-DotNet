@@ -24,7 +24,7 @@ namespace PhoneShopManagementBackend.Controllers
         {
             // Order by OrderDate in descending order
             var orders = _context.Orders
-                .OrderByDescending(o => o.OrderDate)
+                .OrderByDescending(o => o.Id)
                 .ToList();
             return Ok(orders);
         }
