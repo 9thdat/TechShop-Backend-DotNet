@@ -22,7 +22,9 @@ namespace PhoneShopManagementBackend.Controllers
         [HttpGet]
         public ActionResult GetDiscount()
         {
-            var discount = _context.Discounts;
+            var discount = _context.Discounts
+                .OrderByDescending(d => d.Id)
+                .ToList();
             // Lấy ngày hiện tại
             DateTime currentDate = DateTime.Now;
 

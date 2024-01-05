@@ -20,7 +20,9 @@ namespace PhoneShopManagementBackend.Controllers
         [HttpGet]
         public ActionResult Get()
         {
-            var reviews = _context.Reviews;
+            var reviews = _context.Reviews
+                .OrderByDescending(r => r.Id)
+                .ToList();
             return Ok(reviews);
         }
 
